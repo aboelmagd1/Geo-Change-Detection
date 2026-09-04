@@ -1,5 +1,14 @@
-# Geo Change Detection & QC Review Tool
-### Enterprise-Grade ArcGIS Pro Python Toolbox — v5.0.0 (Refined)
+# 🌍 Geo Change Detection & QC Review Tool
+### راصد التغيرات الجغرافية ومراجعة الجودة — ArcGIS Pro Python Toolbox (v5.0.0 Refined)
+
+> **Enterprise ArcGIS Pro Python Toolbox for multi-level spatial change detection, QC issue auditing, and interactive dashboard reporting.**
+
+---
+
+### 📚 Documentation & Quick Links:
+* 📖 **[User Guide (دليل المستخدم الشامل باللغة العربية)](USER_GUIDE.md)** — خطوات التثبيت والتشغيل بالتفصيل مع الأمثلة.
+* ⚙️ **[Parameters Reference (دليل المعاملات الـ 37)](TOOL_PARAMETERS_GUIDE_AR.md)** — شرح تفصيلي لكل معامل وأثره وقيمه الافتراضية.
+* 📋 **[Prompt & System Specification](prompts/MASTER_PROMPT.md)** — المواصفات المعمارية والبرمجية الكاملة للأداة.
 
 ---
 

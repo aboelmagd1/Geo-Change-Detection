@@ -1,0 +1,52 @@
+# ==============================================================================
+# Git Ignore Configuration - Feature Class Change Detection Tool
+# Only track: .md files, .pyt file, ArcGIS Pro metadata XML files, and QC_Data.gdb
+# ==============================================================================
+
+# 1. Ignore everything by default
+*
+
+# 2. Allow directory traversal so Git can discover permitted files
+!*/
+
+# 3. Track .gitignore itself
+!.gitignore
+
+# 4. Include all Markdown documentation files (*.md)
+!*.md
+
+# 5. Include Python Toolbox file (*.pyt) at root
+!/*.pyt
+
+# 6. Include ArcGIS Pro Tool Metadata XML files at root (essential for tool dialog help)
+!GeoChangeDetection.ChangeDetectionTool.pyt.xml
+!GeoChangeDetection.pyt.xml
+!/*.pyt.xml
+!/*.xml
+
+# 7. Include QC_Data.gdb (File Geodatabase)
+!QC_Data.gdb/
+!QC_Data.gdb/**
+!Qc_Data.gdb/
+!Qc_Data.gdb/**
+!QC_Dara.gdb/
+!QC_Dara.gdb/**
+!Qc_Dara.gdb/
+!Qc_Dara.gdb/**
+!test.gdb/
+!test.gdb/**
+
+# ==============================================================================
+# Exclusions (Lock files, test folders, temporary caches, and system files)
+# ==============================================================================
+test/
+*.lock
+*.gdb/*.lock
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+desktop.ini
+*.py
+*.zip   

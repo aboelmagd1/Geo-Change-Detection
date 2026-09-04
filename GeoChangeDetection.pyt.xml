@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en">
+	<Esri>
+		<CreaDate>20260904</CreaDate>
+		<CreaTime>23000000</CreaTime>
+		<ArcGISFormat>1.0</ArcGISFormat>
+		<SyncOnce>FALSE</SyncOnce>
+		<ModDate>20260904</ModDate>
+		<ModTime>230000</ModTime>
+	</Esri>
+	<toolbox name="GeoChangeDetection" alias="GeoChangeDetection">
+		<arcToolboxHelpPath>c:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+		<toolsets/>
+	</toolbox>
+	<dataIdInfo>
+		<idCitation>
+			<resTitle>Geo Change Detection — راصد التغيرات الجغرافية</resTitle>
+		</idCitation>
+		<idAbs>
+[العربية]
+مجموعة أدوات جغرافية مؤسسية متقدمة في ArcGIS Pro لمقارنة وتتبع التغييرات المكانية والهندسية والوصفية بين طبقات المعالم الجغرافية، مع محرك مقارنة هندسي متعدد المستويات ووحدة تدقيق ومطابقة ملاحظات الجودة QC Review وتقارير تفاعلية متقدمة (HTML Dashboard &amp; Excel 5 Sheets).
+
+[English]
+Enterprise GIS Toolbox for comprehensive feature class change detection, multi-level geometry comparison, quality assurance issue tracking, and executive interactive dashboard reporting.
+        </idAbs>
+		<idPurp>
+[العربية] كشف التغيرات الهندسية والوصفية في بيانات نظم المعلومات الجغرافية وتتبع ملاحظات ضبط الجودة وإصدار التقارير التنفيذية.
+[English] Detecting multi-level spatial and attribute changes between baseline and updated feature classes, correlating QC review issues, and generating executive reports.
+        </idPurp>
+		<idCredit>Senior Enterprise GIS &amp; QA/QC Specialist (v5.0.0 Refined)</idCredit>
+		<searchKeys>
+			<keyword>Geo Change Detection</keyword>
+			<keyword>Change Detection</keyword>
+			<keyword>QC Review</keyword>
+			<keyword>Quality Control</keyword>
+			<keyword>ArcGIS Pro</keyword>
+			<keyword>Spatial Join</keyword>
+			<keyword>Geometry Comparison</keyword>
+			<keyword>Cadastral</keyword>
+		</searchKeys>
+	</dataIdInfo>
+	<distInfo>
+		<distributor>
+			<distorFormat>
+				<formatName>ArcToolbox Toolbox</formatName>
+			</distorFormat>
+		</distributor>
+	</distInfo>
+</metadata>

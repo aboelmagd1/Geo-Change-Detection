@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en">
+	<Esri>
+		<CreaDate>20260904</CreaDate>
+		<CreaTime>18450000</CreaTime>
+		<ArcGISFormat>1.0</ArcGISFormat>
+		<SyncOnce>FALSE</SyncOnce>
+		<ModDate>20260904</ModDate>
+		<ModTime>184500</ModTime>
+	</Esri>
+	<toolbox name="GeoChangeDetection" alias="GeoChangeDetection">
+		<arcToolboxHelpPath>c:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+		<toolsets/>
+	</toolbox>
+	<dataIdInfo>
+		<idCitation>
+			<resTitle>Geo Change Detection &amp; QC Review Tool — راصد التغيرات الجغرافية (v5.0.0 Refined)</resTitle>
+			<date>
+				<createDate>2026-09-04</createDate>
+			</date>
+		</idCitation>
+		<idAbs>
+[العربية]
+أداة متقدمة مؤسسية لمقارنة وتتبع التغييرات المكانية (الهندسية) والوصفية بين طبقتين جغرافيتين في ArcGIS Pro، مع محرك مقارنة هندسي متعدد المستويات، ونظام متكامل اختياري لمراجعة الجودة وتتبع الملاحظات (QC Review &amp; Issue Tracking)، وتقارير تفاعلية شاملة (HTML Dashboard &amp; Excel 5 Sheets). تدعم مطابقة المعالم بالربط المكاني، أو بحقول المعرف الفريد، أو بـ OBJECTID. تلتزم الصرامة المؤسسية لمنع فقد البيانات أو تلف المخططات وتفرض قواعد فحص التكرار والمطابقة الطوبولوجية الصارمة.
+
+[English]
+Enterprise-grade ArcGIS Pro geoprocessing tool for comparing two Feature Classes and detecting geometry and attribute changes with an Advanced Multi-Level Geometry Comparison Engine, and an optional QC Review &amp; Issue Tracking correlation module. Supports Spatial Location (Spatial Join), Attribute ID Field, and OBJECTID matching modes. Enforces strict enterprise rules (GDB constraint, unique ID validation, CRS harmonization, greedy spatial tie-breaking). Generates comprehensive GDB feature classes, an executive Excel workbook (5 sheets), and a standalone interactive HTML Dashboard with dark mode.
+        </idAbs>
+		<idPurp>
+[العربية] كشف التغيرات الهندسية والوصفية بدقة متناهية بين حالتين لطبقة معالم جغرافية وتدقيق ملاحظات فحص الجودة QC وإصدار تقارير تنفيذية متقدمة.
+[English] Detecting precise spatial and attribute changes between baseline and updated feature classes, validating quality control issues, and generating executive reports.
+        </idPurp>
+		<idCredit>Senior Enterprise GIS &amp; QA/QC Specialist (v5.0.0 Refined)</idCredit>
+		<searchKeys>
+			<keyword>Change Detection</keyword>
+			<keyword>QC Review</keyword>
+			<keyword>Quality Control</keyword>
+			<keyword>Spatial Join</keyword>
+			<keyword>Geometry Comparison</keyword>
+			<keyword>Attribute Comparison</keyword>
+			<keyword>Cadastral</keyword>
+			<keyword>ArcGIS Pro</keyword>
+			<keyword>Enterprise GIS</keyword>
+			<keyword>HTML Dashboard</keyword>
+		</searchKeys>
+	</dataIdInfo>
+	<distInfo>
+		<distributor>
+			<distorFormat>
+				<formatName>ArcToolbox Tool</formatName>
+			</distorFormat>
+		</distributor>
+	</distInfo>
+	<tool name="ChangeDetectionTool" displayname="Geo Change Detection" toolboxalias="GeoChangeDetection">
+		<summary>
+[العربية]
+يقارن طبقتين من معالم نظم المعلومات الجغرافية (Original و Modified) ويرصد التغيرات الهندسية بدقة متعددة المستويات (مساحة، أطوال، رؤوس، موقع مكاني، شكل، مناسيب Z)، والتغيرات الوصفية للحقول، مع خيار تدقيق ملاحظات الجودة وتتبعها بمصفوفة قرار صارمة (30 حالة)، وتصدير تقارير Excel و HTML تفاعلية.
+
+[English]
+Compares baseline and modified feature classes to detect multi-level geometry changes and attribute updates with optional QC issue correlation and interactive dashboard reporting. Evaluates metric precision, vertex count, spatial displacement, topological shape, and 3D Z coordinates.
+        </summary>
+		<usage>
+[العربية]
+1. اختر الطبقة الأصلية (Original FC) والطبقة المعدلة (Modified FC).
+2. حدد مسار قاعدة البيانات الجغرافية للمخرجات (Output Workspace - File GDB أو Enterprise SDE).
+3. طريقة المطابقة الافتراضية هي الربط المكاني By Spatial Location (Spatial Join) بدون الحاجة لحقل معرف؛ أو اختر By Attribute ID Field مع تحديد الحقل الفريد.
+4. اضبط التسامح المكاني (Spatial Tolerance) - القيمة الافتراضية 0.03 متر (3 سم).
+5. فعّل مجموعة QC Review &amp; Issue Tracking اختيارياً لتدقيق ومطابقة ملاحظات الجودة التاريخية وحساب مسافات التعديل.
+6. انقر Run لاستعراض النتائج مباشرة في الخريطة وتوليد تقارير Excel و HTML التفاعلية وسجل التشغيل Run Log.
+
+[English]
+1. Select the Original Feature Class (baseline) and Modified Feature Class (update).
+2. Specify the Output Workspace (must be a File Geodatabase .gdb or Enterprise SDE).
+3. The default matching method is 'By Spatial Location (Spatial Join)' requiring no unique ID; or select 'By Attribute ID Field' with a designated Unique ID.
+4. Set the Spatial Tolerance - default is 0.03 meters (3 cm).
+5. Optionally enable 'QC Review &amp; Issue Tracking' to correlate historical QC issues with detected changes.
+6. Click 'Run' to inspect outputs in the active map, open multi-sheet Excel reports, and view the standalone interactive HTML Dashboard.
+        </usage>
+		<parameters>
+			<!-- 0: orig_fc -->
+			<param name="orig_fc" displayname="Original Feature Class / Layer" type="Required" direction="Input">
+				<dialogReference>[العربية] الطبقة المرجعية الأصلية التي تمثل الحالة السابقة أو الأساسية (Before State / Master Data).
+[English] The baseline reference feature class representing the previous or original state.</dialogReference>
+			</param>
+			<!-- 1: mod_fc -->
+			<param name="mod_fc" displayname="Modified Feature Class / Layer" type="Required" direction="Input">
+				<dialogReference>[العربية] الطبقة المعدلة التي تمثل التحديث أو الرفع المساحي الجديد المراد تدقيقه ومقارنته (After State / Survey Drawing).
+[English] The updated feature class representing the new survey or modified state to be verified.</dialogReference>
+			</param>
+			<!-- 2: uid_field -->
+			<param name="uid_field" displayname="Unique ID Field (not needed for OBJECTID / Spatial modes)" type="Optional" direction="Input">
+				<dialogReference>[العربية] حقل المعرف الفريد المستخدم للربط عند اختيار المطابقة بالحقول (مثل PARCEL_ID). يطبق عليه فحص صرامة التكرار (Rule 2).
+[English] The unique identifier field used when matching features by attribute ID (e.g. PARCEL_ID). Strict uniqueness is validated (Rule 2).</dialogReference>
+			</param>
+			<!-- 3: out_ws -->
+			<param name="out_ws" displayname="Output Workspace" type="Required" direction="Input">
+				<dialogReference>[العربية] مسار قاعدة البيانات الجغرافية للمخرجات (يجب أن تكون File Geodatabase .gdb أو Enterprise Geodatabase .sde حصراً وفق Rule 1).
+[English] Output workspace geodatabase (must be File Geodatabase .gdb or Enterprise SDE, shapefiles are strictly prohibited by Rule 1).</dialogReference>
+			</param>
+			<!-- 4: out_name -->
+			<param name="out_name" displayname="Output Feature Class Name" type="Required" direction="Input">
+				<dialogReference>[العربية] اسم طبقة المعالم الرئيسية الناتجة التي ستحتوي على كافة تفاصيل التغيرات المكانية والوصفية وتصنيفاتها.
+[English] Name of the main output feature class containing all detected geometry and attribute change classifications.</dialogReference>
+			</param>
+			<!-- 5: compare_attrs -->
+			<param name="compare_attrs" displayname="Compare Attributes" type="Optional" direction="Input">
+				<dialogReference>[العربية] تفعيل أو تعطيل مقارنة البيانات والحقول الوصفية بين الطبقتين (افتراضياً: True).
+[English] Toggle attribute value comparison between matched features (default: True).</dialogReference>
+			</param>
+			<!-- 6: compare_geom -->
+			<param name="compare_geom" displayname="Compare Geometry" type="Optional" direction="Input">
+				<dialogReference>[العربية] المفتاح الرئيسي لتفعيل أو إلغاء محرك المقارنة الهندسية المتعدد المستويات (افتراضياً: True).
+[English] Master switch to enable or disable the multi-level geometry comparison engine (default: True).</dialogReference>
+			</param>
+			<!-- 7: geom_tol -->
+			<param name="geom_tol" displayname="General Geometry Tolerance (Legacy floor)" type="Optional" direction="Input">
+				<dialogReference>[العربية] حد تسامح هندسي عام إضافي للتوافق مع الإصدارات السابقة (افتراضياً: 0.0).
+[English] General geometry difference tolerance threshold for legacy compatibility (default: 0.0).</dialogReference>
+			</param>
+			<!-- 8: ignore_case -->
+			<param name="ignore_case" displayname="Ignore Case Sensitivity in Text Fields" type="Optional" direction="Input">
+				<dialogReference>[العربية] تجاهل حالة الأحرف الإنجليزية الكبيرة والصغيرة (Case Sensitivity) في النصوص لمنع الفروقات الوهمية (افتراضياً: False).
+[English] Ignore upper/lower case differences when comparing text attribute fields (default: False).</dialogReference>
+			</param>
+			<!-- 9: null_empty_eq -->
+			<param name="null_empty_eq" displayname="Treat NULL and Empty String as Equal" type="Optional" direction="Input">
+				<dialogReference>[العربية] اعتبار القيمة الخالية NULL والنص الفارغ "" متطابقين لتفادي الفروقات التقنية الناتجة عن التصدير والتحويل (افتراضياً: False).
+[English] Treat NULL database values and empty string "" as equivalent to avoid export artifacts (default: False).</dialogReference>
+			</param>
+			<!-- 10: same_schema_fields -->
+			<param name="same_schema_fields" displayname="Fields to Compare (Same Schema)" type="Optional" direction="Input">
+				<dialogReference>[العربية] قائمة اختيار متعددة للحقول المراد مقارنتها عند تطابق هيكل الطبقتين (تتضمن افتراضياً كافة الحقول غير النظامية المشتركة).
+[English] Multi-value selection of attribute fields to compare when schemas are identical (defaults to all non-system fields).</dialogReference>
+			</param>
+			<!-- 11: field_mapping -->
+			<param name="field_mapping" displayname="Field Mapping (Different Schema)" type="Optional" direction="Input">
+				<dialogReference>[العربية] جدول ربط ومواءمة الحقول بين الطبقتين عند اختلاف أسمائهما أو بنيتهما مع تحديد نوع المقارنة (Text, Numeric, Date).
+[English] Explicit field mapping table when feature classes have different schemas (Original Field, Modified Field, Compare As type).</dialogReference>
+			</param>
+			<!-- 12: export_added -->
+			<param name="export_added" displayname="Export Added Features Separately" type="Optional" direction="Input">
+				<dialogReference>[العربية] تصدير طبقة مستقلة مخصصة تحتوي فقط على المعالم الجديدة المضافة (_Added).
+[English] Export an independent feature class containing only newly added features (_Added).</dialogReference>
+			</param>
+			<!-- 13: export_deleted -->
+			<param name="export_deleted" displayname="Export Deleted Features Separately" type="Optional" direction="Input">
+				<dialogReference>[العربية] تصدير طبقة مستقلة مخصصة تحتوي فقط على المعالم المحذوفة من الطبقة الأصلية (_Deleted).
+[English] Export an independent feature class containing only deleted features from baseline (_Deleted).</dialogReference>
+			</param>
+			<!-- 14: save_settings -->
+			<param name="save_settings" displayname="Save Comparison Settings to JSON" type="Optional" direction="Input">
+				<dialogReference>[العربية] حفظ جميع المعاملات وخيارات التسامح في ملف خارجي بصيغة JSON لضمان تكرار نفس التحليل بدقة.
+[English] Save current parameters and tolerances to an external JSON configuration file for reproducible audits.</dialogReference>
+			</param>
+			<!-- 15: settings_file -->
+			<param name="settings_file" displayname="Settings File Path (JSON output)" type="Optional" direction="Output">
+				<dialogReference>[العربية] مسار واسم ملف JSON الذي سيتم تصدير الإعدادات إليه عند تفعيل خيار الحفظ.
+[English] Destination path for the exported JSON settings file.</dialogReference>
+			</param>
+			<!-- 16: load_settings_file -->
+			<param name="load_settings_file" displayname="Load Settings from JSON File" type="Optional" direction="Input">
+				<dialogReference>[العربية] استيراد وتطبيق إعدادات مقارنة تم حفظها مسبقاً في ملف JSON بضغطة زر واحدة.
+[English] Load and apply previously saved comparison settings and tolerances from a JSON configuration file.</dialogReference>
+			</param>
+			<!-- 17: filter_change_types -->
+			<param name="filter_change_types" displayname="Filter Output FC by Change Type (empty = all)" type="Optional" direction="Input">
+				<dialogReference>[العربية] تصفية طبقة المعالم الناتجة لعرض أنواع معينة من التغيرات (مثل Geometry Changed فقط). تركها فارغة يصدر كل الحالات.
+[English] Filter main output feature class by specific change types (e.g. Geometry Changed only). Leave empty to export all changes.</dialogReference>
+			</param>
+			<!-- 18: gen_html -->
+			<param name="gen_html" displayname="Generate HTML Report" type="Optional" direction="Input">
+				<dialogReference>[العربية] توليد لوحة مؤشرات أداء تفاعلية شاملة HTML Dashboard مدعومة بالوضع الليلي وأشرطة بيانية وفلاتر فورية.
+[English] Generate a modern, self-contained interactive HTML Dashboard with KPI cards, dark mode toggle, and live search filters.</dialogReference>
+			</param>
+			<!-- 19: add_to_map -->
+			<param name="add_to_map" displayname="Add Result to Current Map" type="Optional" direction="Input">
+				<dialogReference>[العربية] إضافة الطبقات الناتجة تلقائياً إلى خريطة العمل النشطة في ArcGIS Pro فور اكتمال المعالجة.
+[English] Automatically add resulting layers and symbolized feature classes to the active map in ArcGIS Pro.</dialogReference>
+			</param>
+			<!-- 20: match_method -->
+			<param name="match_method" displayname="Match Features By" type="Required" direction="Input">
+				<dialogReference>[العربية] طريقة مطابقة المعالم: الربط المكاني By Spatial Location (Spatial Join) كافتراضي، أو بالمعرف الفريد By Attribute ID Field، أو بالـ OBJECTID.
+[English] Method for pairing features: Spatial Location (Spatial Join) as default, Attribute ID Field, or OBJECTID.</dialogReference>
+			</param>
+			<!-- 21: area_decimal_places -->
+			<param name="area_decimal_places" displayname="Area Decimal Places" type="Optional" direction="Input">
+				<dialogReference>[العربية] عدد الخانات العشرية لتقريب المساحات في المضلعات قبل المقارنة لعزل الفروقات الحسابية المتناهية الصغر (افتراضياً: 3 خانات).
+[English] Number of decimal places to round polygon area before comparison to eliminate floating-point noise (default: 3).</dialogReference>
+			</param>
+			<!-- 22: length_decimal_places -->
+			<param name="length_decimal_places" displayname="Length Decimal Places" type="Optional" direction="Input">
+				<dialogReference>[العربية] عدد الخانات العشرية لتقريب الأطوال والمحيطات للخطوط (افتراضياً: 3 خانات).
+[English] Number of decimal places to round line length or polygon perimeter before comparison (default: 3).</dialogReference>
+			</param>
+			<!-- 23: vertex_count_tolerance -->
+			<param name="vertex_count_tolerance" displayname="Vertex Count Tolerance" type="Optional" direction="Input">
+				<dialogReference>[العربية] حد التسامح في عدد نقاط الرؤوس Vertices للمعلم قبل اعتباره متغيراً في عدد النقاط (افتراضياً: 0).
+[English] Allowable difference in vertex count before flagging as 'Vertex Count Changed' (default: 0).</dialogReference>
+			</param>
+			<!-- 24: spatial_tolerance -->
+			<param name="spatial_tolerance" displayname="Spatial Tolerance (dataset linear units)" type="Optional" direction="Input">
+				<dialogReference>[العربية] أقصى إزاحة مكانية مسموحة لحركة المركز أو المعلم بوحدات الطبقة (افتراضياً: 0.03 متر أي 3 سم). الإزاحة الأعلى منها تسجل كـ Spatial Position Changed.
+[English] Maximum allowable spatial displacement of centroid/endpoints in linear units (default: 0.03 meters / 3 cm). Larger movement triggers 'Spatial Position Changed'.</dialogReference>
+			</param>
+			<!-- 25: compare_spatial_position -->
+			<param name="compare_spatial_position" displayname="Compare Spatial Position" type="Optional" direction="Input">
+				<dialogReference>[العربية] مقارنة حركة وانزياح موقع السنترويد ونقاط البداية والنهاية مقابل حد التسامح المكاني (افتراضياً: True).
+[English] Compare centroid and endpoint displacement against the Spatial Tolerance threshold (default: True).</dialogReference>
+			</param>
+			<!-- 26: compare_vertex_count -->
+			<param name="compare_vertex_count" displayname="Compare Vertex Count" type="Optional" direction="Input">
+				<dialogReference>[العربية] مقارنة عدد نقاط الرؤوس الهندسية المكونة للرسمة لكشف عمليات التبسيط أو التفصيل (افتراضياً: True).
+[English] Compare vertex count differences to detect simplification or densification of geometries (default: True).</dialogReference>
+			</param>
+			<!-- 27: compare_geometry_shape -->
+			<param name="compare_geometry_shape" displayname="Compare Geometry Shape" type="Optional" direction="Input">
+				<dialogReference>[العربية] فحص التطابق الطوبولوجي الدقيق للشكل الهندسي geom1.equals(geom2) لكشف تشوه الشكل وثبات المساحة (افتراضياً: True).
+[English] Topological geometry shape equivalence test geom1.equals(geom2) to detect shape distortion even with identical area (default: True).</dialogReference>
+			</param>
+			<!-- 28: compare_z -->
+			<param name="compare_z" displayname="Compare Z Coordinates" type="Optional" direction="Input">
+				<dialogReference>[العربية] مقارنة المناسيب والارتفاعات الرأسية في الطبقات ثلاثية الأبعاد 3D (افتراضياً: False).
+[English] Enable 3D vertical Z-coordinate comparison for 3D polyline, polygon, or point features (default: False).</dialogReference>
+			</param>
+			<!-- 29: z_tolerance -->
+			<param name="z_tolerance" displayname="Z Tolerance (dataset units)" type="Optional" direction="Input">
+				<dialogReference>[العربية] سماحية فرق المنسوب الرأسي المسموح به بوحدات الطبقة (افتراضياً: 0.001 متر أي 1 ملم).
+[English] Allowable difference threshold for Z-coordinate elevations in dataset units (default: 0.001 meters / 1 mm).</dialogReference>
+			</param>
+			<!-- 30: report_folder -->
+			<param name="report_folder" displayname="Report Output Folder (Excel &amp; HTML)" type="Optional" direction="Input">
+				<dialogReference>[العربية] مجلد حفظ تقارير Excel و HTML وسجل التدقيق الشامل Run Log (افتراضياً: مجلد المشروع homeFolder).
+[English] Destination folder for generated Excel workbooks, HTML dashboards, and execution audit run logs (default: project homeFolder).</dialogReference>
+			</param>
+			<!-- 31: qc_enabled -->
+			<param name="qc_enabled" displayname="Enable QC Review / Issue Tracking" type="Optional" direction="Input">
+				<dialogReference>[العربية] تفعيل منظومة الربط المتبادل بين كشف التغيرات وملاحظات فحص الجودة التاريخية بمصفوفة القرار (30 حالة).
+[English] Enable QC Review and Issue Tracking module to cross-correlate historical QC issues with detected changes via 30-case decision matrix.</dialogReference>
+			</param>
+			<!-- 32: create_qc_issues -->
+			<param name="create_qc_issues" displayname="Create QC Issues Feature Class (Template)" type="Optional" direction="Input">
+				<dialogReference>[العربية] إنشاء طبقة قالب نقطية جاهزة لفحص الجودة QC_Issues محملة بنطاقات القيم المقيدة Coded Domains القياسية.
+[English] Create a ready-to-use QC Issues point feature class template with standard schema and coded value domains.</dialogReference>
+			</param>
+			<!-- 33: existing_qc_issues -->
+			<param name="existing_qc_issues" displayname="Existing QC Issues (Feature Class / Layer)" type="Optional" direction="Input">
+				<dialogReference>[العربية] تحديد طبقة ملاحظات الجودة الحالية المراد تقييمها ومطابقتها بنتائج كشف التغير وحساب مسافة التعديل.
+[English] Existing QC issues point layer to correlate against detected changes, calculating modification distance and status.</dialogReference>
+			</param>
+			<!-- 34: qc_output -->
+			<param name="qc_output" displayname="QC Review Result Feature Class Name" type="Optional" direction="Input">
+				<dialogReference>[العربية] اسم طبقة نتائج تقييم الجودة الناتجة الحاملة لأكواد QA-1 إلى QA-5 وملاحظات المراجع.
+[English] Name of the resulting QC review feature class preserving reviewer notes, correlation metrics, and QA-1..QA-5 assessments.</dialogReference>
+			</param>
+			<!-- 35: ambiguity_tolerance -->
+			<param name="ambiguity_tolerance" displayname="Ambiguity Tolerance (Spatial Join Tie-Break Fraction)" type="Optional" direction="Input">
+				<dialogReference>[العربية] كسر عشري نسبي (افتراضياً: 0.02 أي 2%) لكشف التنافس المتساوي وحماية البيانات وتصنيفها كـ Ambiguous Match.
+[English] Relative tie-break fraction (default: 0.02 / 2%) to detect ambiguous spatial matches and prevent false pairings.</dialogReference>
+			</param>
+			<!-- 36: validate_only -->
+			<param name="validate_only" displayname="Validation / Dry-Run Only (No outputs written)" type="Optional" direction="Input">
+				<dialogReference>[العربية] تشغيل الأداة في وضع التحقق التجريبي الجاف لفحص الأنظمة والحسابات وتكرار المعرفات دون كتابة أي طبقات على القرص.
+[English] Run in dry-run validation mode to verify schemas, unique IDs, and coordinate systems without writing any data to disk.</dialogReference>
+			</param>
+		</parameters>
+	</tool>
+</metadata>

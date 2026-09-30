@@ -37,6 +37,10 @@
 - **Python**: البيئة الافتراضية المدمجة مع ArcGIS Pro (`arcgispro-py3`).
 - **المكتبات**: `arcpy` و `openpyxl` (تأتي افتراضيًا مع ArcGIS Pro).
 
+> [!NOTE]
+> **ضمان أمان البيانات والقراءة الصرفة (Strict Read-Only Guarantee):**
+> تعمل الأداة بنظام **القراءة فقط (Strictly Read-Only)** وتستخدم حصرياً `arcpy.da.SearchCursor` لقراءة الطبقات الأصلية والمعدلة. الأداة لا تُجري أي تعديل أو حذف أو إضافة على بيانات أو اسكيما (Schema) الطبقات المدخلة نهائياً. كافة المعالجات المكانية الوسيطة تتم داخل ذاكرة الرام (`memory\`) وتُحذف فوراً، وجميع النتائج تُنشأ كطبقات وملفات جديدة مستقلة داخل مسار المخرجات `Output Workspace`.
+
 ---
 
 ## 🛠 كيفية إضافة الأداة في ArcGIS Pro
@@ -94,10 +98,12 @@
 |---|---|---|
 | **Original Feature Class / Layer** | الطبقة الأصلية (قبل التعديل). تقبل طبقات الخريطة أو ملفات من الـ GDB. | *مطلوب* |
 | **Modified Feature Class / Layer** | الطبقة المعدلة (بعد التعديل). تقبل طبقات الخريطة أو ملفات من الـ GDB. | *مطلوب* |
-| **Match Features By** | طريقة مطابقة العناصر بين الطبقتين: <br>• `By Spatial Location (Spatial Join)`: مطابقة مكانية عبر تداخل المعالم (الأسهل والأسرع).<br>• `By Attribute ID Field`: مطابقة بواسطة حقل المعرف الفريد.<br>• `By OBJECTID (Automatic)`: مطابقة عبر رقم الـ OBJECTID. | `By Spatial Location` |
+| **Match Features By** | طريقة مطابقة العناصر بين الطبقتين: <br>• `By Spatial Location (Spatial Join)`: مطابقة مكانية عبر تداخل المعالم.<br>• `By Attribute ID Field`: مطابقة بواسطة حقل المعرف الفريد.<br>• `By OBJECTID (Automatic)`: مطابقة عبر رقم الـ OBJECTID. | `By Spatial Location` |
 | **Unique ID Field** | حقل المعرف الفريد (يظهر فقط ويُطلب عند اختيار `By Attribute ID Field`). | — |
-| **Output Workspace** | قاعدة البيانات الجغرافية أو المجلد لحفظ النتائج. | `Default.gdb` |
+| **Ambiguity Tolerance** | نسبة السماحية للالتباس المكاني (0.02 = 2%). عند تنافس مرشحين بنسبة تداخل متقاربة (مثل حالات تقسيم أو دمج القطع)، تُصنف الأداة المعلم كـ `Ambiguous Match — Manual Review Required` منعاً للربط العشوائي. | `0.02` |
+| **Output Workspace** | قاعدة البيانات الجغرافية لحفظ النتائج (**يلزم File أو Enterprise GDB**). | `Default.gdb` |
 | **Output Feature Class Name** | اسم الطبقة الناتجة. | `ChangeDetection_Result` |
+| **Validation / Dry-Run Only** | اختبار جاهزية البيانات والاسكيما ونظام الإحداثيات دون كتابة أي ملفات على القرص. | `False` |
 
 ---
 
@@ -250,6 +256,21 @@ QC_Issues (Point)
 ---
 
 ## 📊 شرح المخرجات والنتائج
+
+### طبقة نتائج المقارنة (Output Feature Class)
+
+تحتوي الطبقة الناتجة على هيكل بيانات متكامل وموسّع لاستيعاب كافة الحالات:
+- `Unique_ID` (Text 255): المعرف الفريد أو رقم الـ OID للمعلم.
+- `Change_Type` (Text 50): نوع التغير النهائي (`No Change`, `Geometry Changed`, `Attribute Changed`, `Geometry and Attribute Changed`, `Added`, `Deleted`, أو `Ambiguous Match — Manual Review Required`).
+- `Geometry_Changed` (Text 20): مؤشر التغير الهندسي (`Yes`, `No`, `Ambiguous`, `N/A`).
+- `Attributes_Changed` (Text 20): مؤشر تغير البيانات الوصفية (`Yes`, `No`, `Ambiguous`, `N/A`).
+- `Geometry_Change_Reason` (Text 500): النص التفصيلي لسبب التغير الهندسي المرصود.
+- `Area_Changed`, `Length_Changed`, `Vertex_Count_Changed`, `Spatially_Changed`, `Shape_Changed` (Text 20): مؤشرات فرعية مفصلة لكل جانب هندسي.
+- `Changed_Fields` (Text 2000): أسماء الحقول التي تغيرت مفصولة بفواصل.
+- `Old_Values` و `New_Values` (Text 4000): تمثيل JSON مضغوط للقيم قبل وبعد التعديل.
+- الحقول الرقمية للفروقات: `Old_Area`, `New_Area`, `Area_Diff`, `Area_Diff_Pct`, `Centroid_Distance`, إلخ.
+
+---
 
 ### تقرير الإكسل (Excel 5-Sheet Report)
 

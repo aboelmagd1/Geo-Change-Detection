@@ -666,6 +666,58 @@ def _create_qc_review_result_fc(out_ws, name="QC_Review_Result", sr=None):
 
 
 # ---------------------------------------------------------------------------
+# Message Wrapper
+# ---------------------------------------------------------------------------
+
+class MessageWrapper:
+    """
+    Safe wrapper around ArcGIS MessagesObject / custom messages.
+    ArcGIS Pro's MessagesObject provides addMessage, addWarningMessage, and addErrorMessage.
+    This wrapper normalizes addWarning/addError calls to prevent AttributeError.
+    """
+    def __init__(self, msg):
+        self._msg = msg
+
+    def addMessage(self, m):
+        if hasattr(self._msg, "addMessage"):
+            self._msg.addMessage(str(m))
+        elif hasattr(self._msg, "AddMessage"):
+            self._msg.AddMessage(str(m))
+        else:
+            arcpy.AddMessage(str(m))
+
+    def addWarningMessage(self, m):
+        if hasattr(self._msg, "addWarningMessage"):
+            self._msg.addWarningMessage(str(m))
+        elif hasattr(self._msg, "AddWarningMessage"):
+            self._msg.AddWarningMessage(str(m))
+        elif hasattr(self._msg, "addWarning"):
+            self._msg.addWarning(str(m))
+        elif hasattr(self._msg, "AddWarning"):
+            self._msg.AddWarning(str(m))
+        else:
+            arcpy.AddWarning(str(m))
+
+    def addWarning(self, m):
+        self.addWarningMessage(m)
+
+    def addErrorMessage(self, m):
+        if hasattr(self._msg, "addErrorMessage"):
+            self._msg.addErrorMessage(str(m))
+        elif hasattr(self._msg, "AddErrorMessage"):
+            self._msg.AddErrorMessage(str(m))
+        elif hasattr(self._msg, "addError"):
+            self._msg.addError(str(m))
+        elif hasattr(self._msg, "AddError"):
+            self._msg.AddError(str(m))
+        else:
+            arcpy.AddError(str(m))
+
+    def addError(self, m):
+        self.addErrorMessage(m)
+
+
+# ---------------------------------------------------------------------------
 # Core change detection engine
 # ---------------------------------------------------------------------------
 
@@ -691,7 +743,7 @@ class ChangeEngine:
 
     def __init__(self, params, messages):
         self.p   = params
-        self.msg = messages
+        self.msg = MessageWrapper(messages)
         self.reprojections = []
         self.type_mismatches = []
         self.ambiguous_matches = []
@@ -786,7 +838,7 @@ class ChangeEngine:
                     )
 
         if reproject_msg:
-            self.msg.addWarning(reproject_msg)
+            self.msg.addWarningMessage(reproject_msg)
             self.reprojections.append(reproject_msg)
         else:
             self.msg.addMessage(f"CRS Check: Both FCs share compatible projected coordinate system: {sr_orig.name}")
@@ -1465,7 +1517,7 @@ class ChangeEngine:
         f_status      = _find_field(["QC_Status", "QCSTATUS", "STATUS"])
 
         if not f_feat_id:
-            self.msg.addWarning(
+            self.msg.addWarningMessage(
                 f"QC Issues dataset '{qc_fc}' does not have a recognizable 'Feature_ID' field. "
                 f"Using 'OID@' as fallback Feature ID."
             )
@@ -1932,7 +1984,7 @@ class ChangeEngine:
                 f.write("\n".join(lines))
             self.msg.addMessage(f"  Run Log: {log_path}")
         except Exception as ex:
-            self.msg.addWarning(f"Could not write audit run log: {ex}")
+            self.msg.addWarningMessage(f"Could not write audit run log: {ex}")
 
     # ------------------------------------------------------------------
     # Main run
@@ -2020,7 +2072,7 @@ class ChangeEngine:
                 if not cas and not _is_compatible_type(t1, t2):
                     mis_msg = f"Type mismatch between '{of}' ({t1}) and '{mf}' ({t2})."
                     self.type_mismatches.append(mis_msg)
-                    self.msg.addWarning(f"[Field_Type_Mismatch] {mis_msg}")
+                    self.msg.addWarningMessage(f"[Field_Type_Mismatch] {mis_msg}")
 
         # Dry-run / Validation mode branch (§10)
         if validate_only:
@@ -2042,7 +2094,7 @@ class ChangeEngine:
             self.msg.addMessage(f"  Workspace: {out_ws} (Valid Geodatabase)")
             self.msg.addMessage(f"  Compared Field Pairs: {len(field_pairs)}")
             if self.type_mismatches:
-                self.msg.addWarning(f"  Field Type Warnings: {len(self.type_mismatches)} mismatch(es) detected.")
+                self.msg.addWarningMessage(f"  Field Type Warnings: {len(self.type_mismatches)} mismatch(es) detected.")
             self.msg.addMessage("Dry-run validation complete. No output feature classes or reports were written.")
             self.msg.addMessage("=" * 65)
             return None, None, None, None
@@ -2082,7 +2134,7 @@ class ChangeEngine:
                     json.dump(settings, jf, indent=2, default=str)
                 self.msg.addMessage(f"Settings saved -> {settings_file}")
             except Exception as ex:
-                self.msg.addWarning(f"Could not save settings: {ex}")
+                self.msg.addWarningMessage(f"Could not save settings: {ex}")
 
         self.msg.addMessage(f"Match method: {match_method}")
         arcpy.SetProgressorPosition(1)
@@ -2339,7 +2391,7 @@ class ChangeEngine:
                         out_p   = os.path.join(out_ws, "QC_Issues").lower().replace("/", "\\")
                         if exist_p == out_p:
                             should_create = False
-                            self.msg.addWarning("Existing QC Issues points to target template; skipping recreation to preserve existing data.")
+                            self.msg.addWarningMessage("Existing QC Issues points to target template; skipping recreation to preserve existing data.")
                     except Exception:
                         pass
                 if should_create:
@@ -2370,7 +2422,7 @@ class ChangeEngine:
                         f"Deleted={qc_stats['deleted']:,}"
                     )
             elif not create_qc_issues:
-                self.msg.addWarning(
+                self.msg.addWarningMessage(
                     "QC Review was enabled but no valid 'Existing QC Issues' dataset was provided, "
                     "and 'Create QC Issues Feature Class' was not checked."
                 )
@@ -2590,14 +2642,14 @@ class ChangeEngine:
         str_fields = [
             ("Unique_ID",              255),
             ("Change_Type",             50),
-            ("Geometry_Changed",         5),
-            ("Attributes_Changed",       5),
-            ("Geometry_Change_Reason", 255),
-            ("Area_Changed",             5),
-            ("Length_Changed",           5),
-            ("Vertex_Count_Changed",     5),
-            ("Spatially_Changed",        5),
-            ("Shape_Changed",            5),
+            ("Geometry_Changed",        20),
+            ("Attributes_Changed",      20),
+            ("Geometry_Change_Reason", 500),
+            ("Area_Changed",            20),
+            ("Length_Changed",          20),
+            ("Vertex_Count_Changed",    20),
+            ("Spatially_Changed",       20),
+            ("Shape_Changed",           20),
             ("Changed_Fields",        2000),
             ("Old_Values",            4000),
             ("New_Values",            4000),
@@ -2694,7 +2746,7 @@ class ChangeEngine:
             from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
             from openpyxl.utils import get_column_letter
         except ImportError:
-            self.msg.addWarning(
+            self.msg.addWarningMessage(
                 "openpyxl not found — Excel export skipped. "
                 "Install: pip install openpyxl"
             )
@@ -5601,6 +5653,7 @@ class ChangeDetectionTool:
     # ----------------------------------------------------------------
 
     def execute(self, parameters, messages):
+        messages = MessageWrapper(messages)
         try:
             orig_fc        = parameters[0].valueAsText
             mod_fc         = parameters[1].valueAsText
@@ -5695,7 +5748,7 @@ class ChangeDetectionTool:
                         qc_output_name     = qc_saved.get("qc_output", qc_output_name)
 
                 except Exception as ex:
-                    messages.addWarning(f"Could not load settings: {ex}")
+                    messages.addWarningMessage(f"Could not load settings: {ex}")
 
             # Validate UID field requirement
             if match_method in (_MATCH_BY_ATTR, _MATCH_BY_ATTR_ALT) and not uid_field:

@@ -53,6 +53,16 @@ Perform enterprise-grade spatial and tabular comparison between an **Original Fe
 ### Rule 7 — Compact JSON Serialization
 * Detailed attribute changes (`Old_Values` and `New_Values`) are serialized as compact, machine-parseable JSON strings (`{"FIELD":"value"}`) without extraneous whitespace.
 
+### Rule 8 — Non-Destructive Read-Only Operation
+* Input Feature Classes (`orig_fc` and `mod_fc`) are strictly **Read-Only**.
+* Access is performed exclusively via `arcpy.da.SearchCursor`. The tool never modifies, adds, or deletes source features or schema fields.
+* Intermediate structures (e.g. spatial join candidates) reside in temporary in-memory workspaces (`memory\`) and are automatically deleted upon completion.
+
+### Rule 9 — Robust Schema & Geoprocessing Messaging Architecture
+* Output Feature Class schema allocates `TEXT(20)` for all change flag fields (`Geometry_Changed`, `Attributes_Changed`, `Spatially_Changed`, `Shape_Changed`, `Area_Changed`, `Length_Changed`, `Vertex_Count_Changed`) to safely store multi-character values such as `"Ambiguous"`, `"Yes"`, `"No"`, and `"N/A"`.
+* `Geometry_Change_Reason` is allocated as `TEXT(500)` to ensure comprehensive, un-truncated diagnostic descriptions.
+* Tool execution integrates `MessageWrapper` to normalize warnings and errors against ArcGIS Pro's native internal `MessagesObject` (`addWarningMessage` vs `addWarning`), eliminating `AttributeError` during on-the-fly CRS reprojections.
+
 ---
 
 ## 3. Multi-Level Geometry Comparison Engine
@@ -113,7 +123,7 @@ The tool evaluates the correlation between historical QC Issue Types (`IT-1`..`I
 ## 5. Tool Deliverables Specification
 
 ### A. Geodatabase Feature Classes (in Output Workspace)
-1. **`{out_name}`**: Main comparison output with complete change schema (`Change_Type`, `Geometry_Change_Reason`, `Old_Values`, `New_Values`, `Old_Area`, `New_Area`, `Area_Diff`, `Centroid_Distance`, etc.).
+1. **`{out_name}`**: Main comparison output with complete change schema (`Change_Type`, `Geometry_Change_Reason` [TEXT 500], change flags [TEXT 20: `Geometry_Changed`, `Attributes_Changed`, `Spatially_Changed`, `Shape_Changed`, etc.], `Old_Values` [TEXT 4000], `New_Values` [TEXT 4000], `Old_Area`, `New_Area`, `Area_Diff`, `Centroid_Distance`, etc.).
 2. **`{out_name}_Added`** *(optional)*: Independent layer containing only newly added features.
 3. **`{out_name}_Deleted`** *(optional)*: Independent layer containing only deleted features from baseline.
 4. **`{qc_output}`** *(optional)*: Point feature class preserving reviewer notes, correlation metrics (`Distance_To_Current_Feature`, `Current_Feature_X/Y`), and `QA-1`..`QA-5` assessment codes.

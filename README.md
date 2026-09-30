@@ -43,6 +43,8 @@ A production-grade, enterprise-ready ArcGIS Pro Python Toolbox (`.pyt`) designed
 | 8 | **Execution Audit Run Log** | Automatically generates a timestamped execution audit run log (`{out_name}_{run_id}_audit.log`) capturing run parameters, row counts, reprojections, type mismatches, and elapsed runtime. |
 | 9 | **3-Column Field Mapping** | Schema differences support `Orig_Field`, `Mod_Field`, and explicit `Compare_As` coercion (`text`, `numeric`, `date`) with automated `Field_Type_Mismatch` warnings. |
 | 10 | **Versioned Settings Schema** | Versioned JSON settings persistence (`"schema_version": "5.0"`) with full backward compatibility for older configuration files. |
+| 11 | **Strict Read-Only Guarantee** | Inputs (`orig_fc` and `mod_fc`) are strictly read-only (`arcpy.da.SearchCursor` only). Source data and schemas are 100% unaltered. Intermediate layers use temporary `memory\` and are automatically purged. |
+| 12 | **Hardened Schema & Messaging Engine** | Normalized ArcGIS Pro messaging via `MessageWrapper` preventing `MessagesObject` attribute errors. Result schema expanded (`Geometry_Changed`, `Attributes_Changed`, `Spatially_Changed`, etc. to `TEXT(20)`, and `Geometry_Change_Reason` to `TEXT(500)`) preventing field length overflows on `"Ambiguous"` spatial matches. |
 
 ---
 
@@ -173,7 +175,7 @@ If `Feature_ID` cannot be located in **either** Original or Modified dataset →
 
 ## Deliverables & Outputs
 
-1. **Change Detection Feature Class (`ChangeDetection_Result`)**: Full inventory of compared features with `Change_Type`, explicit `Geometry_Change_Reason`, metric deltas, and compact JSON `Old_Values` / `New_Values`.
+1. **Change Detection Feature Class (`ChangeDetection_Result`)**: Full inventory of compared features with `Change_Type`, explicit `Geometry_Change_Reason` (`TEXT 500`), change flag indicators (`Geometry_Changed`, `Attributes_Changed`, `Spatially_Changed`, `Shape_Changed`, `Area_Changed`, `Length_Changed`, `Vertex_Count_Changed` as `TEXT 20` supporting values like `"Ambiguous"`, `"Yes"`, `"No"`), metric deltas, and compact JSON `Old_Values` / `New_Values`.
 2. **QC Review Result Feature Class (`QC_Review_Result`)**: Point feature class containing reviewer notes preserved verbatim, `QC_Assessment` (`QA-1`..`QA-5`), `Distance_To_Current_Feature`, `Review_Run_ID`, and `Review_Date`.
 3. **Multi-Sheet Excel Report (5 Sheets)**:
    - `Summary`: Executive metrics, geometry reason breakdown, and QC KPI summary.

@@ -5,8 +5,8 @@
 		<CreaTime>23000000</CreaTime>
 		<ArcGISFormat>1.0</ArcGISFormat>
 		<SyncOnce>FALSE</SyncOnce>
-		<ModDate>20260904</ModDate>
-		<ModTime>230000</ModTime>
+		<ModDate>20261001</ModDate>
+		<ModTime>010913</ModTime>
 	</Esri>
 	<toolbox name="GeoChangeDetection" alias="GeoChangeDetection">
 		<arcToolboxHelpPath>c:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
@@ -14,7 +14,7 @@
 	</toolbox>
 	<dataIdInfo>
 		<idCitation>
-			<resTitle>Geo Change Detection — راصد التغيرات الجغرافية</resTitle>
+			<resTitle>GeoChangeDetection</resTitle>
 		</idCitation>
 		<idAbs>
 [العربية]
